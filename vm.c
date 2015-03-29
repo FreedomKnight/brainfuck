@@ -15,8 +15,8 @@ bool vm_init(void)
     return true;
 }
 
-byte *vm_expend_memory(byte* memory) {
-   byte *new_memory = realloc(memory, vm->data_size *= 2); 
+byte *vm_expend_data_mem(byte* memory) {
+   byte *new_memory = realloc(memory, vm->data_size += DEFAULT_MEMSIZE); 
    if (new_memory != memory)
        free(memory);
 
@@ -27,10 +27,11 @@ bool vm_shift(int step)
 {
     if (vm->data_cur + step < vm->data_head) {
         return false;
-    } else if (vm->data_cur + step > vm->data_size) {
-        vm->data_memory = vm_expend_memory(vm->data_memory);
+    } else if (vm->data_cur + step > vm->data_head + vm->data_size) {
+        vm->data_memory = vm_expend_data_mem(vm->data_memory);
     }
 
+    vm->data_cur += step;
     return true;
 }
 
@@ -38,6 +39,13 @@ bool vm_execute(byte command) {
     switch (command) {
     case LEFT:
         vm_shift(-1);
+        break;
+    case RIGHT:
+        vm_shift(+1);
+        break;
+    case INC:
+        break;
+    case SUB:
         break;
     default:
         break;
