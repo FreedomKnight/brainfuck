@@ -14,7 +14,8 @@ typedef struct VM {
     byte *data_cur;
     byte *code_head;
     byte *code_cur;
-    unsigned int size;
+    unsigned int data_size;
+    unsigned int code_size;
 } VM;
 
 VM *vm;

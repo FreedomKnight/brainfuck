@@ -9,21 +9,28 @@ bool vm_init(void)
     memset(vm, 0, sizeof(VM));
     vm->data_memory = (byte *) malloc(sizeof(byte) * DEFAULT_MEMSIZE);
     memset(vm->data_memory, 0, sizeof(byte) * DEFAULT_MEMSIZE);
-    vm->head = vm->data_memory;
-    vm->cur = vm->head;
-    vm->size = DEFAULT_MEMSIZE;
+    vm->data_head = vm->data_memory;
+    vm->data_cur = vm->data_head;
+    vm->data_size = DEFAULT_MEMSIZE;
     return true;
 }
 
-byte *vm_expend_memory(byte* memory, unsigned int size) {
-   byte *new_memory = realloc(memory, size); 
+byte *vm_expend_memory(byte* memory) {
+   byte *new_memory = realloc(memory, vm->data_size *= 2); 
+   if (new_memory != memory)
+       free(memory);
+
+   return new_memory;
 }
 
 bool vm_shift(int step)
 {
-    if (vm->cur + step < 0) {
+    if (vm->data_cur + step < vm->data_head) {
         return false;
-    } else if (vm->cur + step 
+    } else if (vm->data_cur + step > vm->data_size) {
+        vm->data_memory = vm_expend_memory(vm->data_memory);
+    }
+
     return true;
 }
 
