@@ -1,9 +1,12 @@
 #include <stdlib.h>
 #include "lexer.h"
+#include "parser.h"
 #include "vm.h"
 
 int main(int argc, char** argv)
 {
+    int i = 0;
+    byte *code = NULL;
     if (argc <= 1) {
         in = stdin;
         out = stdout;
@@ -13,6 +16,11 @@ int main(int argc, char** argv)
     }
 
     vm_init();
-    printf("%c\n", get_instr_ch());
+    code = parser();
+
+    while (code && *code) {
+        printf("%d\n", code[i]);
+        i++;
+    }
     exit(0);
 }

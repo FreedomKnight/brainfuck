@@ -45,8 +45,8 @@ byte *parser() {
     byte *code = (byte *) malloc(sizeof(byte) * DEFAULT_MEMSIZE);
     char ch = '\0';
     int i = 0;
-    memset(code, 0, DEFAULT_MEMSIZE);
-    while ( ( ch = get_instr_ch() ) != EOF) {
+    memset(code, 0, sizeof(byte) * DEFAULT_MEMSIZE);
+    while ((ch = get_instr_ch()) != EOF) {
         code[i] = ch2instr(ch);
         i++;
     }
