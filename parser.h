@@ -7,6 +7,7 @@ extern "C" {
 #define TOTAL_INSTR 8
 #include "vm.h"
 
+unsigned int code_size(byte *code);
 byte *parser(void);
 
 #ifdef __cplusplus

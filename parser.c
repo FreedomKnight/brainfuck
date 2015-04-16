@@ -40,6 +40,14 @@ byte ch2instr(char ch)
     return (byte) instr;
 }
     
+unsigned int code_size(byte *code)
+{
+    unsigned int i = 0;
+    while (code[i])
+        i++;
+
+    return i;
+}
 
 byte *parser() {
     byte *code = (byte *) malloc(sizeof(byte) * DEFAULT_MEMSIZE);

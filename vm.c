@@ -23,6 +23,17 @@ byte *vm_expend_data_mem(byte* memory) {
    return new_memory;
 }
 
+unsigned int get_pos()
+{
+    return vm->data_cur - vm->data_head;
+}
+
+
+byte get_cur()
+{
+    return *(vm->data_cur);
+}
+
 bool vm_shift(int step)
 {
     if (vm->data_cur + step < vm->data_head) {
@@ -35,7 +46,8 @@ bool vm_shift(int step)
     return true;
 }
 
-bool vm_execute(byte command) {
+bool vm_execute(byte command)
+{
     switch (command) {
     case LEFT:
         vm_shift(-1);
@@ -44,11 +56,14 @@ bool vm_execute(byte command) {
         vm_shift(+1);
         break;
     case INC:
+        (*(vm->data_cur))++;
         break;
     case SUB:
+        (*(vm->data_cur))--;
         break;
     default:
         break;
     }
+
     return true;
 }

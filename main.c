@@ -18,9 +18,10 @@ int main(int argc, char** argv)
     vm_init();
     code = parser();
 
-    while (code && *code) {
-        printf("%d\n", code[i]);
-        i++;
+    i = 0;
+    for (i = 0; i < code_size(code); i++) {
+        printf("instr: %d pos: %d data: %d\n", code[i], get_cur());
+        vm_execute(code[i]);
     }
     exit(0);
 }

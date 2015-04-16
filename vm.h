@@ -20,6 +20,9 @@ typedef struct VM {
 
 VM *vm;
 bool vm_init(void);
+bool vm_execute(byte command);
+byte get_cur();
+unsigned int get_pos();
 
 
 #endif
