@@ -8,10 +8,8 @@
 
 bool vm_init(void)
 {
-    vm = (VM *) malloc(sizeof(VM));
-    memset(vm, 0, sizeof(VM));
-    vm->data_phy_head = (byte *) malloc(sizeof(byte) * DEFAULT_MEMSIZE);
-    memset(vm->data_phy_head, 0, sizeof(byte) * DEFAULT_MEMSIZE);
+    vm = (VM *) calloc(1, sizeof(VM));
+    vm->data_phy_head = (byte *) calloc(DEFAULT_MEMSIZE, sizeof(byte));
     vm->data_phy_size = DEFAULT_MEMSIZE;
     vm->data_start = vm->data_phy_head + (DEFAULT_MEMSIZE * 1 / 4);
     vm->data_size = DEFAULT_MEMSIZE / 2;
@@ -25,10 +23,12 @@ bool vm_expend_data_mem(byte** memory) {
     byte *old_memory = *memory;
     byte *new_memory = NULL;
     vm->data_phy_size *= 2;
-    new_memory = (byte *) malloc(sizeof(byte) * vm->data_phy_size);
-    memset(new_memory, 0, vm->data_phy_size);
+    new_memory = (byte *) calloc(vm->data_phy_size, sizeof(byte));
     vm->data_size = vm->data_phy_size / 2;
-    for (i = vm->data_phy_size * 1 / 4, j = 0; j < old_size; j++)
+    for (i = vm->data_phy_size * 1 / 4, j = old_size * 1 / 4; j < old_size; i++, j++)
+        new_memory[i] = old_memory[j];
+
+    for (i = vm->data_phy_size * 1 / 4, j = old_size * 1 / 4; old_memory + j < vm->data_start; i--, j--)
         new_memory[i] = old_memory[j];
         
     vm->data_start = new_memory + (vm->data_phy_size * 1 / 4);
@@ -52,7 +52,7 @@ bool vm_shift(int step)
 {
     if (vm->data_start + vm->data_cur + step < vm->data_phy_head) {
         vm_expend_data_mem(&vm->data_phy_head);
-    } else if (vm->data_cur + step > vm->data_phy_size) {
+    } else if (vm->data_cur + step > (int) vm->data_phy_size) {
         vm_expend_data_mem(&vm->data_phy_head);
     }
 

@@ -1,6 +1,6 @@
 #ifndef VM_H
 #define VM_H
-#define DEFAULT_MEMSIZE 1
+#define DEFAULT_MEMSIZE 4096
 #include "bf.h"
 typedef enum Command {
     UNKNOWN, LEFT, RIGHT, INC, SUB, IN, OUT, LOOP_COND, LOOP_END
