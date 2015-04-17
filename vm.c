@@ -1,45 +1,59 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "vm.h"
+
+#define CUR_DATA vm->data_start[vm->data_cur]
 
 bool vm_init(void)
 {
     vm = (VM *) malloc(sizeof(VM));
     memset(vm, 0, sizeof(VM));
-    vm->data_memory = (byte *) malloc(sizeof(byte) * DEFAULT_MEMSIZE);
-    memset(vm->data_memory, 0, sizeof(byte) * DEFAULT_MEMSIZE);
-    vm->data_head = vm->data_memory;
-    vm->data_cur = vm->data_head;
-    vm->data_size = DEFAULT_MEMSIZE;
+    vm->data_phy_head = (byte *) malloc(sizeof(byte) * DEFAULT_MEMSIZE);
+    memset(vm->data_phy_head, 0, sizeof(byte) * DEFAULT_MEMSIZE);
+    vm->data_phy_size = DEFAULT_MEMSIZE;
+    vm->data_start = vm->data_phy_head + (DEFAULT_MEMSIZE * 1 / 4);
+    vm->data_size = DEFAULT_MEMSIZE / 2;
+    vm->data_cur = 0;
     return true;
 }
 
-byte *vm_expend_data_mem(byte* memory) {
-   byte *new_memory = realloc(memory, vm->data_size += DEFAULT_MEMSIZE); 
-   if (new_memory != memory)
-       free(memory);
+bool vm_expend_data_mem(byte** memory) {
+    int i = 0, j = 0;
+    unsigned int old_size = vm->data_phy_size;
+    byte *old_memory = *memory;
+    byte *new_memory = NULL;
+    vm->data_phy_size *= 2;
+    new_memory = (byte *) malloc(sizeof(byte) * vm->data_phy_size);
+    memset(new_memory, 0, vm->data_phy_size);
+    vm->data_size = vm->data_phy_size / 2;
+    for (i = vm->data_phy_size * 1 / 4, j = 0; j < old_size; j++)
+        new_memory[i] = old_memory[j];
+        
+    vm->data_start = new_memory + (vm->data_phy_size * 1 / 4);
+    free(old_memory);
+    *memory = new_memory;
 
-   return new_memory;
+    return true;
+}
+
+byte get_data()
+{
+    return vm->data_start[vm->data_cur];
 }
 
 unsigned int get_pos()
 {
-    return vm->data_cur - vm->data_head;
-}
-
-
-byte get_cur()
-{
-    return *(vm->data_cur);
+    return vm->data_cur;
 }
 
 bool vm_shift(int step)
 {
-    if (vm->data_cur + step < vm->data_head) {
-        return false;
-    } else if (vm->data_cur + step > vm->data_head + vm->data_size) {
-        vm->data_memory = vm_expend_data_mem(vm->data_memory);
+    if (vm->data_start + vm->data_cur + step < vm->data_phy_head) {
+        vm_expend_data_mem(&vm->data_phy_head);
+    } else if (vm->data_cur + step > vm->data_phy_size) {
+        vm_expend_data_mem(&vm->data_phy_head);
     }
 
     vm->data_cur += step;
@@ -56,10 +70,16 @@ bool vm_execute(byte command)
         vm_shift(+1);
         break;
     case INC:
-        (*(vm->data_cur))++;
+        CUR_DATA++;
         break;
     case SUB:
-        (*(vm->data_cur))--;
+        CUR_DATA--;
+        break;
+    case IN:
+        CUR_DATA = getc(in);
+        break;
+    case OUT:
+        putc(CUR_DATA, out);
         break;
     default:
         break;
